@@ -5,6 +5,7 @@ import java.util.List;
 import model.interests.Interest;
 
 public class Agent {
+	//aa
 	private int age;
 	private Location location;
 	private List<Interest> interests;
