@@ -8,6 +8,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Paint;
 import java.awt.Stroke;
+import java.util.LinkedList;
+import java.util.Random;
 
 import javax.swing.JPanel;
 
@@ -15,17 +17,21 @@ import org.apache.commons.collections15.Transformer;
 
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.SparseGraph;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import graph.GraphVisualisation;
 import graph.LayoutType;
+import graph.LineChart_AWT;
 
 public class GraphPanel extends JPanel {
 
     private VisualizationViewer<Integer, String> vv; // visualization viewer of graph
     private Layout<Integer, String> actualGrLayout = null; // displayed layout
     private Graph<Integer, String> graph; // graph
+    private Graph<Integer, String> partOfGraph;; // graph
     private LayoutType layoutType = LayoutType.CIRCLE; // actually chosen layout of a graph
+    private int verticesToShow;
 
 
  
@@ -119,7 +125,7 @@ public class GraphPanel extends JPanel {
         }
         repaint();
     }
-
+    private static final Random rand = new Random(); // object that generates random numbers
     /**
      * Creates visualization of a graph with actualIndividual one from population
      *
@@ -128,7 +134,9 @@ public class GraphPanel extends JPanel {
      * @return visualization
      */
     public synchronized VisualizationViewer<Integer, String> actualizeVisualization( boolean changedGraph) {
-   
+
+      
+    	System.out.println(graph.getVertexCount()+"A");
         if (changedGraph) {
             actualGrLayout = GraphVisualisation.getLayout(graph, layoutType);
             Dimension dim = new Dimension((int)getSize().getWidth()*3, (int)getSize().getHeight()*3);
@@ -144,7 +152,16 @@ public class GraphPanel extends JPanel {
         return vv;
     }
 
-    /**
+    public int getVerticesToShow() {
+		return verticesToShow;
+	}
+
+
+	public void setVerticesToShow(int verticesToShow) {
+		this.verticesToShow = verticesToShow;
+	}
+
+	/**
      * Paints edges - if it's in a actualIndividual one, it's blue; otherwise black.
      */
     public class EdgePainting implements Transformer<String, Paint> {
@@ -200,4 +217,8 @@ public class GraphPanel extends JPanel {
         }
 
     }
+
+
+
+
 }

@@ -14,76 +14,31 @@ import java.util.Random;
 
 import org.apache.commons.collections15.Factory;
 
+import edu.uci.ics.jung.algorithms.filters.Filter;
+import edu.uci.ics.jung.algorithms.filters.KNeighborhoodFilter;
+import edu.uci.ics.jung.algorithms.filters.KNeighborhoodFilter.EdgeType;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseGraph;
 import edu.uci.ics.jung.graph.util.Pair;
 import exceptions.NoPossibilityToCreateGraphException;
 import exceptions.ProblemWithReadingGraphFromFileException;
+import model.ContactsWebCreator;
 
 public class Graf {
 
     private static final Random rand = new Random(); // object that generates random numbers
     private Graph<Integer, String> graph; // graph
+    private Graph<Integer, String> graphPart; // graph
     private int searchedKCliqueSize; // size of K-Clique that we try to find in graph
     private Factory<Integer> vertexFactory; // vertex factory, for drawing
     private Factory<String> edgeFactory; // edge factory, for drawing
     private int nodeCount, edgeCount; // only for drawing, do not use
-
-    /**
-     * Constructor - creates random sparse graph with given parameters
-     *
-     * @param vertices - amount of vertices
-     * @param edges - amount of edges
-     * @param existedKCliqueSize - minimum k-clique size (amount of vertices)
-     * that will exist in created graph
-     * @throws NoPossibilityToCreateGraphException
-     * @throws GeneticAlgorithmException
-     */
-    public Graf(int vertices, int edges, int existedKCliqueSize) throws NoPossibilityToCreateGraphException {
-        String problem;
-        if ((problem = checkPossibilityOfCreationNewGraph(vertices, edges)) != null) {
-            throw new NoPossibilityToCreateGraphException(problem);
-        }
-        if (existedKCliqueSize > vertices) {
-            throw new NoPossibilityToCreateGraphException("Nie mo¿na utworzyæ grafu o " + vertices + " wierzcho³kach zawieraj¹cego klikê o rozmiarze " + existedKCliqueSize);
-        }
-        if ((existedKCliqueSize * (existedKCliqueSize - 1) / 2) > edges) {
-            throw new NoPossibilityToCreateGraphException("Nie mo¿na utworzyæ grafu o "  + vertices + "wierzcho³kach, który ma " + edges + " krawêdzie i zawiera klikê o rozmiarze " + existedKCliqueSize);
-        }
-        if (existedKCliqueSize > vertices) {
-            throw new NoPossibilityToCreateGraphException("Nie mo¿na utworzyæ grafu o "  + vertices + "wierzcho³kach, który ma " + edges + " krawêdzie i zawiera klikê o rozmiarze " + existedKCliqueSize);
-        }
-        graph = createGraphVertices(vertices);
-        LinkedList<Integer> verticesList = new LinkedList<>();
-        for (int i = 1; i <= vertices; i++) {
-            verticesList.add(i);
-        }
-        LinkedList<Integer> verticesList2 = new LinkedList<>();
-        for (int i = 1; i <= existedKCliqueSize; i++) {
-            int randV = rand.nextInt(verticesList.size());
-            verticesList2.add(verticesList.get(randV));
-            verticesList.remove(randV);
-        }
-        LinkedList<Edge> edgesList = new LinkedList<>();
-        for (int i = 1; i <= existedKCliqueSize; i++) {
-            for (int j = i + 1; j <= existedKCliqueSize; j++) {
-                edgesList.add(new Edge(verticesList2.get(i - 1), verticesList2.get(j - 1)));
-            }
-        }
-        int kCliqueEgdesAmount = existedKCliqueSize * (existedKCliqueSize - 1) / 2;
-        fillGraphWithEdges(graph, edgesList, 0, kCliqueEgdesAmount);
-        edgesList = new LinkedList<>();
-        for (int i = 1; i <= vertices - existedKCliqueSize; i++) {
-            for (int j = i + 1; j <= vertices - existedKCliqueSize; j++) {
-                edgesList.add(new Edge(verticesList.get(i - 1), verticesList.get(j - 1)));
-            }
-        }
-        for (int i = 1; i <= vertices - existedKCliqueSize; i++) {
-            for (int j = 1; j <= existedKCliqueSize; j++) {
-                edgesList.add(new Edge(verticesList.get(i - 1), verticesList2.get(j - 1)));
-            }
-        }
-        fillGraphWithEdges(graph, edgesList, kCliqueEgdesAmount, edges);
+    private ContactsWebCreator creator;
+    private int verticesToShow;
+    private LineChart_AWT chart;
+    private LineChart_AWT chart1;
+   public void setFinalGraph(Graph<Integer, String> graph) {
+    	this.graph = graph;
     }
 
     /**
@@ -91,11 +46,17 @@ public class Graf {
      *
      * @param vertices - amount of vertices
      * @param edges - amount of edges
+     * @param chart 
      * @throws NoPossibilityToCreateGraphException
      * @throws GeneticAlgorithmException
      */
-    public Graf(int vertices, int edges) throws NoPossibilityToCreateGraphException{
-    	  generate(vertices,edges);
+    public Graf(int vertices, int edges, int verticesToShow, LineChart_AWT chart,LineChart_AWT chart1) throws NoPossibilityToCreateGraphException{
+    	this.verticesToShow = verticesToShow;
+    	this.setChart(chart); 
+    	this.setChart1(chart1);
+    	creator = new ContactsWebCreator(this);
+    	  creator.setAmountOfContacts(vertices);
+    	  creator.generateWeb();
     }
     
  
@@ -405,7 +366,7 @@ public class Graf {
      * @param verticesAmount - amount of vertices
      * @return graph
      */
-    private Graph<Integer, String> createGraphVertices(int verticesAmount) {
+    public Graph<Integer, String> createGraphVertices(int verticesAmount) {
         Graph<Integer, String> tempGraph = new SparseGraph<>();
         for (int i = 1; i <= verticesAmount; i++) {
             tempGraph.addVertex((Integer) i);
@@ -491,4 +452,59 @@ public class Graf {
             }
         }
     }
+
+	public Graph<Integer, String> getGraphPart() {
+    	int randEdge;
+    	LinkedList<Integer> list = new LinkedList<>();
+    	graphPart = new SparseGraph<>();
+        for (Integer v : graph.getVertices()){
+            graphPart.addVertex(v);
+            list.add(v);
+        }
+
+        for (String e : graph.getEdges()){
+            graphPart.addEdge(e, graph.getIncidentVertices(e));
+            
+        }
+        //verticesToShow=40;
+    System.out.println(verticesToShow);
+        //Graph<Integer, String> partOfGraph = new SparseGraph<>();
+//        for (int i = 0; i < graph.getVertexCount()-verticesToShow; i++) {
+//            while(!list.contains(randEdge = rand.nextInt(graph.getVertexCount()))){
+//            }
+//            graphPart.removeVertex(randEdge);
+//            for(int k=0;k<list.size();k++)
+//            	{	if(list.get(k)==randEdge)list.remove(k);
+//            		
+//            	}
+//        }
+     
+        		int k = verticesToShow; // maximum hops
+        		Integer startVertex = rand.nextInt(graph.getVertexCount());// ... (pick your starting node)
+        		Filter<Integer, String> filter = new KNeighborhoodFilter<Integer, String>(
+        		    startVertex, k, EdgeType.IN_OUT);
+        		Graph<Integer, String> neighborhood = filter.transform(graph);
+
+		return neighborhood;
+	}
+
+	public void setGraphPart(Graph<Integer, String> graphPart) {
+		this.graphPart = graphPart;
+	}
+
+	public LineChart_AWT getChart() {
+		return chart;
+	}
+
+	public void setChart(LineChart_AWT chart) {
+		this.chart = chart;
+	}
+
+	public LineChart_AWT getChart1() {
+		return chart1;
+	}
+
+	public void setChart1(LineChart_AWT chart1) {
+		this.chart1 = chart1;
+	}
 }

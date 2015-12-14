@@ -32,11 +32,12 @@ public class SimulationGUI extends JFrame {
         initComponents();
         
         this.resultsPanel = new ResultsViewPanel(graphPanel, controller);
-   
+   generationPanel =new GraphGenerationPanel(graphPanel, controller, tabChoosePanel);
+  
         tabChoosePanel.addTab("Symulacja", simulationPanel);
-        tabChoosePanel.addTab("Generacja grafu", new GraphGenerationPanel(graphPanel, controller, tabChoosePanel));
+        tabChoosePanel.addTab("Generacja grafu", generationPanel);
         tabChoosePanel.addTab("Symulacja iteracji", resultsPanel);
-        graphActualizer = new GraphVisualizationAndButtonsStateActualizer(controller, graphPanel, stopButton, startButton, tabChoosePanel);
+        graphActualizer = new GraphVisualizationAndButtonsStateActualizer(controller, graphPanel, stopButton, startButton, tabChoosePanel,((GraphGenerationPanel) generationPanel).getVerticesCountToShow());
       
         controller.setAktualizator(graphActualizer);
         startThreads();
@@ -238,6 +239,7 @@ public class SimulationGUI extends JFrame {
     private javax.swing.JMenuBar menuBar;
 
     private javax.swing.JPanel simulationPanel;
+    private javax.swing.JPanel generationPanel;
     private javax.swing.JButton startButton;
     private javax.swing.JButton stopButton;
     private javax.swing.JTabbedPane tabChoosePanel;

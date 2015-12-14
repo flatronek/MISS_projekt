@@ -6,10 +6,12 @@ import model.interests.Interest;
 
 public class Agent {
 	//aa
+	private int id;
 	private int age;
 	private Location location;
 	private List<Interest> interests;
 	private List<Agent> friends;
+	private Family family;
 	
 	public List<Agent> getFriends() {
 		return friends;
@@ -49,5 +51,21 @@ public class Agent {
 	
 	public void setAge(int age) {
 		this.age = age;
+	}
+
+	public Family getFamily() {
+		return family;
+	}
+
+	public void setFamily(Family family) {
+		this.family = family;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

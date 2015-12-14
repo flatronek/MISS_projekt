@@ -5,6 +5,7 @@ package GUI;
 
 
 import java.awt.Color;
+import java.awt.GridBagLayout;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
@@ -22,6 +23,7 @@ import exceptions.NoPossibilityToCreateGraphException;
 import exceptions.ProblemWithReadingGraphFromFileException;
 import graph.Graf;
 import graph.LayoutType;
+import graph.LineChart_AWT;
 
 public class GraphGenerationPanel extends javax.swing.JPanel {
 
@@ -54,8 +56,11 @@ public class GraphGenerationPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         generationParameters = new javax.swing.JPanel();
-        verticesCount = new javax.swing.JSpinner(new SpinnerNumberModel(10, 2, 800, 1));
+        generationParameters.setLayout(new BoxLayout(generationParameters, BoxLayout.PAGE_AXIS));
+        verticesCount = new javax.swing.JSpinner(new SpinnerNumberModel(400, 2, 1500, 1));
         verticesCountLabel = new javax.swing.JLabel();
+        setVerticesCountToShow(new javax.swing.JSpinner(new SpinnerNumberModel(3, 2, (int)verticesCount.getValue(), 1)));
+        verticesCountToShowLabel = new javax.swing.JLabel();
         edgesCount = new javax.swing.JSpinner(new SpinnerNumberModel(10, 1, 2000, 1));
         edgesCountLabel = new javax.swing.JLabel();
         
@@ -73,6 +78,7 @@ public class GraphGenerationPanel extends javax.swing.JPanel {
         verticesCount.setToolTipText("Ustaw wartoœci");
 
         verticesCountLabel.setText("Wierzcho³ki");
+        verticesCountToShowLabel.setText("Wierzcho³ki do pokazania");
 
         edgesCount.setToolTipText("Ustaw wartoœci");
 
@@ -95,14 +101,27 @@ public class GraphGenerationPanel extends javax.swing.JPanel {
         JPanel vert = new JPanel();
         vert.add(verticesCountLabel);
         vert.add(verticesCount);
+        vert.add(verticesCountToShowLabel);
+        vert.add(getVerticesCountToShow());
+
         generationParameters.add(vert);
         
         JPanel edg = new JPanel();
         edg.add(edgesCountLabel);
         edg.add(edgesCount);
+        setChart1(new LineChart_AWT(
+      	      "Degrees of the Vertices" ,
+      	      ""));
+      getChart1().setVisible( true );
+   
         generationParameters.add(edg);
+        setChart(new LineChart_AWT(
+        	      "Degrees of the Vertices" ,
+        	      ""));
+        getChart().setVisible( true );
+        generationParameters.add(getChart());
         
-
+        
         JPanel gbtn = new JPanel();
    
     
@@ -110,7 +129,7 @@ public class GraphGenerationPanel extends javax.swing.JPanel {
        
         generationParameters.add(gbtn);
         
-        generationParameters.setLayout(new BoxLayout(generationParameters,BoxLayout.Y_AXIS));
+
         
        
 
@@ -174,8 +193,10 @@ public class GraphGenerationPanel extends javax.swing.JPanel {
         JPanel gdrw = new JPanel();
         gdrw.add(drawButton);
         gdrw.add(finishDrawingButton);
+        drawingControlPanel.setLayout(new BoxLayout(drawingControlPanel, BoxLayout.PAGE_AXIS));
+        drawingControlPanel.add(getChart1());
         drawingControlPanel.add(gdrw);
-        
+      
 
         JPanel empty1 = new JPanel();
         JPanel empty2 = new JPanel();
@@ -201,8 +222,9 @@ public class GraphGenerationPanel extends javax.swing.JPanel {
     private void generateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateButtonActionPerformed
 
             try {
-                grafKreator = new Graf((int) verticesCount.getValue(), (int) edgesCount.getValue());
+                grafKreator = new Graf((int) verticesCount.getValue()-1, (int) edgesCount.getValue(), (int) getVerticesCountToShow().getValue(),chart,chart1);
                 acceptNewGraph();
+                verticesCountToShow.setModel(new SpinnerNumberModel(3, 2, (int)verticesCount.getValue(), 1));
             } catch (NoPossibilityToCreateGraphException ex) {
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Ostrze¿enie", JOptionPane.ERROR_MESSAGE);
             }
@@ -214,7 +236,7 @@ public class GraphGenerationPanel extends javax.swing.JPanel {
      * and sets it in controller.
      */
     public void acceptNewGraph() {
-        graphPanel.displayNewGraph(grafKreator.getGraph());
+        graphPanel.displayNewGraph(grafKreator.getGraphPart());
         controller.setGraf(grafKreator);
 
       
@@ -328,7 +350,31 @@ public class GraphGenerationPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
 
-    private javax.swing.JButton drawButton;
+    public javax.swing.JSpinner getVerticesCountToShow() {
+		return verticesCountToShow;
+	}
+
+	public void setVerticesCountToShow(javax.swing.JSpinner verticesCountToShow) {
+		this.verticesCountToShow = verticesCountToShow;
+	}
+
+	public LineChart_AWT getChart() {
+		return chart;
+	}
+
+	public void setChart(LineChart_AWT chart) {
+		this.chart = chart;
+	}
+
+	public LineChart_AWT getChart1() {
+		return chart1;
+	}
+
+	public void setChart1(LineChart_AWT chart1) {
+		this.chart1 = chart1;
+	}
+
+	private javax.swing.JButton drawButton;
     private javax.swing.JPanel drawingControlPanel;
     private javax.swing.JSpinner edgesCount;
     private javax.swing.JLabel edgesCountLabel;
@@ -338,10 +384,13 @@ public class GraphGenerationPanel extends javax.swing.JPanel {
 
     private javax.swing.JComboBox layoutChooserCheckBox;
     private javax.swing.JLabel layoutLabel;
-
+private LineChart_AWT chart;
+private LineChart_AWT chart1;
 
     private javax.swing.JPanel settingLayoutPanel;
     private javax.swing.JSpinner verticesCount;
+    private javax.swing.JSpinner verticesCountToShow;
     private javax.swing.JLabel verticesCountLabel;
+    private javax.swing.JLabel verticesCountToShowLabel;
     // End of variables declaration//GEN-END:variables
 }

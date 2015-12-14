@@ -7,6 +7,7 @@ import GUI.GraphPanel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 
 public class GraphVisualizationAndButtonsStateActualizer extends Thread {
@@ -14,9 +15,12 @@ public class GraphVisualizationAndButtonsStateActualizer extends Thread {
     private boolean paused = true; // flag
     private final Controller controller; // aplication controller
     private final GraphPanel graphPanel; // panel with graph to actualize
+    
     private final JButton stopButton; // button stopping application
     private final JButton startButton; // button starting application
     private final JTabbedPane tabs; // needed to enable/disable one of tab when 
+    private JSpinner verticesCountToShow;
+    private int count;
     //its state should be chenged
 
     /**
@@ -25,8 +29,9 @@ public class GraphVisualizationAndButtonsStateActualizer extends Thread {
      * @param controller - aplication controller
      * @param graphPanel - panel with graph to actualize
      */
-    public GraphVisualizationAndButtonsStateActualizer(Controller controller, GraphPanel graphPanel, JButton stopButton, JButton startButton, JTabbedPane tabs) {
-        this.controller = controller;
+    public GraphVisualizationAndButtonsStateActualizer(Controller controller, GraphPanel graphPanel, JButton stopButton, JButton startButton, JTabbedPane tabs,JSpinner vertices) {
+    	this.verticesCountToShow = vertices;
+    	this.controller = controller;
         this.graphPanel = graphPanel;
         this.stopButton = stopButton;
         this.startButton = startButton;
@@ -50,8 +55,10 @@ public class GraphVisualizationAndButtonsStateActualizer extends Thread {
 
     @Override
     public void run() {
+
         while (true) {
             if (!paused) {
+            	System.out.println("tu2");
                 pauseActualizer();
                 graphPanel.actualizeVisualization( false);
                 graphPanel.repaint();
